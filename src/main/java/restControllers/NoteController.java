@@ -22,7 +22,7 @@ import services.NoteService;
 @RestController
 @RequestMapping("/api/notes")
 public class NoteController {
-	
+	// Notes Controller UserDetails will give the username as was passed for the loaduser in jwtFilter
 	private final NoteService noteService;
 	
 	@Autowired
@@ -33,7 +33,7 @@ public class NoteController {
 
 	@PostMapping
 	public Note createNote(@RequestBody String content, @AuthenticationPrincipal UserDetails userDetails ) {
-		String username = userDetails.getUsername();
+		String username = userDetails.getUsername(); // its email we extracted
 		System.out.println("Username: " + username);
 		return this.noteService.createNoteForUser(username, content);
 	}

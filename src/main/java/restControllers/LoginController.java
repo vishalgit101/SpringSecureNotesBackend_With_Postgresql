@@ -31,11 +31,14 @@ public class LoginController {
 
 
 	@PostMapping
-	public ResponseEntity<Map<String, Object>> login( @RequestBody Users user) {
+	public ResponseEntity<Map<String, Object>> login( @RequestBody Map<String, String> userPayload) {
 		System.out.println("Login controller got hit");
-		System.out.println("Users: " + user);
+		System.out.println("Users Payload: " + userPayload);
 		//return "success";
-		String jwtToken =  this.userService.verify(user);
+		Users tempUsers = new Users();
+		tempUsers.setEmail(userPayload.get("username"));
+		tempUsers.setPassword(userPayload.get("password"));
+		String jwtToken =  this.userService.verify(tempUsers);
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("jwtToken", jwtToken);
 		return ResponseEntity.ok(data);

@@ -22,10 +22,10 @@ public class MyUserDetailsService implements  UserDetailsService{
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		
 		// loading the user from the dB
-		Optional<Users> optionalUser = this.userRepo.findByUsername(username);
+		Optional<Users> optionalUser = this.userRepo.findByEmail(email); // do find by email
 		
 		Users user = optionalUser.orElseThrow(()-> new UsernameNotFoundException("User not Found with user name and password"));
 		

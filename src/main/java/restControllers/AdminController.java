@@ -53,7 +53,7 @@ public class AdminController {
 		System.out.println("User controller for fetching single user got hit");
 		Users user = this.userServiceImpl.findByUserId(userId);
 		System.out.println(user);
-		return ResponseEntity.ok().body(user);
+		return ResponseEntity.ok().body(user); // directly returning user
 	}
 	
 	@PutMapping("/update-lock-status")

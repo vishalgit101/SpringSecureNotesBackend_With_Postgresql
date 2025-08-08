@@ -8,7 +8,7 @@ import java.util.*;
 import entity.Role;
 import entity.Users;
 
-public class UserPrincipal implements UserDetails{
+public class UserPrincipal implements UserDetails{ // Notes Controller UserDetails will give the username as was passed for loaduser
 
 	private Users user;
 	
@@ -64,7 +64,8 @@ public class UserPrincipal implements UserDetails{
 
 	@Override
 	public String getUsername() {
-		return this.user.getUsername();
+		// using email as username
+		return this.user.getEmail();
 	}
 	
 	public boolean is2faEnabled() {

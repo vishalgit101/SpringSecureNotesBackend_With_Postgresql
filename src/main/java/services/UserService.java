@@ -13,7 +13,7 @@ public interface UserService {
 	
 	Users registerUser(Users user);
 	
-	Users findByUsername(String username);
+	//Users findByUsername(String username);
 	
 	Users updateRole(Long userId, String roleName );
 	
@@ -39,7 +39,7 @@ public interface UserService {
 
 	void resetPassword(String token, String newPassword);
 
-	Optional<Users> findByUsernameOptional(String username);
+	//Optional<Users> findByUsernameOptional(String username);
 
 	void updateCredentials(Users user, String newUsername, String newPassword);
 
@@ -52,6 +52,12 @@ public interface UserService {
 	void disable2FA(Long userId);
 
 	void contactForm(Map<String, String> payoad);
+
+	// Email methods instead of username
+	
+	Users findByEmail(String email);
+
+	Optional<Users> findByEmailOptional(String email);
 
 	
 }

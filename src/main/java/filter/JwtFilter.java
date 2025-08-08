@@ -39,16 +39,17 @@ public class JwtFilter extends OncePerRequestFilter {
 		//Check for Auth Header
 		String authHeader = request.getHeader("Authorization");
 		String token = null;
-		String username = null;
+		String email = null;
 		
 		if(authHeader !=null && authHeader.startsWith("Bearer ")) {
 			token = authHeader.substring(7);
-			username = this.jwtService.extractUsername(token);
+			email = this.jwtService.extractUsername(token);
 			
 			// check if the user is not null and if the user if=s not already authenticated
-			if(username != null && SecurityContextHolder.getContext().getAuthentication() == null ) {
+			if(email != null && SecurityContextHolder.getContext().getAuthentication() == null ) {
 				
-				UserDetails userDetails = this.context.getBean(MyUserDetailsService.class).loadUserByUsername(username);
+				// 
+				UserDetails userDetails = this.context.getBean(MyUserDetailsService.class).loadUserByUsername(email);
 				
 				// validate token and Username that we are checking should be part of the database
 				if(this.jwtService.validateToken(token, userDetails)) {

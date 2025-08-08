@@ -68,6 +68,11 @@ public class UserServiceImpl implements UserService {
 			throw new UserAlreadyExists("Username '" + user.getUsername() + "' is already taken!");
 		}
 		
+		if(this.userRepo.existsByEmail(user.getEmail())) {
+			System.out.println("User already exists");
+			throw new UserAlreadyExists("Email '" + user.getEmail() + "' is already taken!");
+		}
+		
 		// also get the role from the db to assign a default role 
 		Optional<Role> optionalRole = this.roleRepo.findByRole("USER");
 		Role role = optionalRole.orElseThrow(() -> new RuntimeException("No Role found with role name USER"));
@@ -78,22 +83,22 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override // admin ??
-	public Users findByUsername(String username) {
-		Optional<Users> optionalUser = this.userRepo.findByUsername(username);
-		Users user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " +  username));
+	public Users findByEmail(String email) {
+		Optional<Users> optionalUser = this.userRepo.findByEmail(email);
+		Users user = optionalUser.orElseThrow(() -> new RuntimeException("User not found with email: " +  email));
 		
 		return user;
 	}
 	
 	@Override
-	public Optional<Users> findByUsernameOptional(String username){
-		return this.userRepo.findByUsername(username);
+	public Optional<Users> findByEmailOptional(String email){
+		return this.userRepo.findByEmail(email);
 	}
 	
 	@Override
 	public Users findByUserId(Long userId) {
 		Optional<Users> tempUser =  this.userRepo.findById(userId);
-		Users user = tempUser.orElseThrow(()-> new UsernameNotFoundException("User not found with user id: " + userId));
+		Users user = tempUser.orElseThrow(()-> new RuntimeException("User not found with user id: " + userId));
 		System.out.println("User By UserId in UserService: " + user);
 		return user;
 	}
@@ -109,7 +114,7 @@ public class UserServiceImpl implements UserService {
 		String[] roleNameWithPrefix = tempRoleName.split("_");
 		String roleName = roleNameWithPrefix[1];
 		Optional<Users> optionalUser = this.userRepo.findById(userId);
-		Users user = optionalUser.orElseThrow(() ->  new UsernameNotFoundException("User not found with user id of: " + userId));
+		Users user = optionalUser.orElseThrow(() ->  new RuntimeException("User not found with user id of: " + userId));
 		
 		Optional<Role> optionalRole = this.roleRepo.findByRole(roleName);
 		Role role = optionalRole.orElseThrow(() -> new RuntimeException("No role with Role Name found: " + roleName));
@@ -137,7 +142,7 @@ public class UserServiceImpl implements UserService {
 		// get the auth-manager, that will use/call the daoprovider for matching/verifying the credentials
 		
 		// Get the Authentication object and use the authManager object to  authenticate the user
-		Authentication authentication = this.authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+		Authentication authentication = this.authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
 		
 		// Its like Authentication Object (UnAuthenticated) -> Through this.authManager -> Becomes Authenticated Object 
 		
@@ -156,6 +161,7 @@ public class UserServiceImpl implements UserService {
 			//so get the user principal
 			UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 			
+			// principal username actually refers to email
 			return this.jwtService.generateToken(principal.getUsername(),principal.is2faEnabled());
 		}
 		
@@ -166,7 +172,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void updateAccountLockStatus(Long userId, boolean lock) {
 		Optional<Users> optionalUser = this.userRepo.findById(userId);
-		Users tempUser = optionalUser.orElseThrow(()-> new UsernameNotFoundException("No User Found"));
+		Users tempUser = optionalUser.orElseThrow(()-> new RuntimeException("No User Found"));
 		tempUser.setAccountNonLocked(!lock);
 		this.userRepo.save(tempUser);
 	}
@@ -182,7 +188,7 @@ public class UserServiceImpl implements UserService {
 	public void updateAccountExpiryStatus(Long userId, boolean expire) {
 		
 		Optional<Users> optionalUser = this.userRepo.findById(userId);
-		Users tempUser = optionalUser.orElseThrow(()-> new UsernameNotFoundException("No User Found"));
+		Users tempUser = optionalUser.orElseThrow(()-> new RuntimeException("No User Found"));
 		tempUser.setAccountNonExpired(!expire);
 		this.userRepo.save(tempUser);
 		
@@ -192,7 +198,7 @@ public class UserServiceImpl implements UserService {
 	public void updateAccountEnabledStatus(Long userId, boolean enabled) {
 		
 		Optional<Users> optionalUser = this.userRepo.findById(userId);
-		Users tempUser = optionalUser.orElseThrow(()-> new UsernameNotFoundException("No User Found"));
+		Users tempUser = optionalUser.orElseThrow(()-> new RuntimeException("No User Found"));
 		tempUser.setEnabled(enabled);
 		this.userRepo.save(tempUser);
 		
@@ -202,7 +208,7 @@ public class UserServiceImpl implements UserService {
 	public void updateCredentialsExpiryStatus(Long userId, boolean expire) {
 		
 		Optional<Users> optionalUser = this.userRepo.findById(userId);
-		Users tempUser = optionalUser.orElseThrow(()-> new UsernameNotFoundException("No User Found"));
+		Users tempUser = optionalUser.orElseThrow(()-> new RuntimeException("No User Found"));
 		tempUser.setCredentialsNonExpired(!expire);
 		this.userRepo.save(tempUser);
 		
@@ -213,7 +219,7 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 			Optional<Users> optionalUser = this.userRepo.findById(userId);
-			Users tempUser = optionalUser.orElseThrow(()-> new UsernameNotFoundException("No User Found"));
+			Users tempUser = optionalUser.orElseThrow(()-> new RuntimeException("No User Found"));
 			tempUser.setPassword(this.encoder.encode(password));
 			this.userRepo.save(tempUser);
 		}catch (Exception e) {
@@ -225,8 +231,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void generatePasswordResetToken(String email) {
 		// find user by that email
-		Optional<Users> optUser = this.userRepo.findByUsername(email);
-		Users user = optUser.orElseThrow(()-> new UsernameNotFoundException("User Not found"));
+		Optional<Users> optUser = this.userRepo.findByEmail(email);
+		Users user = optUser.orElseThrow(()-> new RuntimeException("User Not found"));
 		
 		// now pass the user in the constructor of password reset token object's instance
 		PasswordResetToken passwordResetToken = new PasswordResetToken(user); // its constructor did the job of creating everything
@@ -237,7 +243,7 @@ public class UserServiceImpl implements UserService {
 		String resetUrl = frontendUrl + "/reset-password?token=" + passwordResetToken.getToken();
 		
 		// Send Email to the User
-		this.emailService.sendPasswordResetEmail(user.getUsername(), resetUrl); // username is email
+		this.emailService.sendPasswordResetEmail(user.getEmail(), resetUrl); // username is email
 	}
 
 	@Override
@@ -284,7 +290,7 @@ public class UserServiceImpl implements UserService {
 	// for 2FA or MFA
 	@Override
 	public GoogleAuthenticatorKey generateAuthenticatorKey(Long userId) {
-		Users user = this.userRepo.findById(userId).orElseThrow(()-> new UsernameNotFoundException("No user found"));
+		Users user = this.userRepo.findById(userId).orElseThrow(()-> new RuntimeException("No user found"));
 		GoogleAuthenticatorKey key = this.totpService.generateSecret();
 		user.setTwoFactorSecret(key.getKey());
 		this.userRepo.save(user);
@@ -293,20 +299,20 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public boolean validate2FACode(Long userId, int code) {
-		Users user = this.userRepo.findById(userId).orElseThrow(()-> new UsernameNotFoundException("No user found"));
+		Users user = this.userRepo.findById(userId).orElseThrow(()-> new RuntimeException("No user found"));
 		return this.totpService.verifyCode(user.getTwoFactorSecret(), code);
 	}
 	
 	@Override
 	public void enable2FA(Long userId) {
-		Users user = this.userRepo.findById(userId).orElseThrow(()-> new UsernameNotFoundException("No user found"));
+		Users user = this.userRepo.findById(userId).orElseThrow(()-> new RuntimeException("No user found"));
 		user.setTwoFactorEnabled(true);
 		this.userRepo.save(user);
 	}
 	
 	@Override
 	public void disable2FA(Long userId) {
-		Users user = this.userRepo.findById(userId).orElseThrow(()-> new UsernameNotFoundException("No user found"));
+		Users user = this.userRepo.findById(userId).orElseThrow(()-> new RuntimeException("No user found"));
 		user.setTwoFactorEnabled(false);
 		this.userRepo.save(user);
 	}

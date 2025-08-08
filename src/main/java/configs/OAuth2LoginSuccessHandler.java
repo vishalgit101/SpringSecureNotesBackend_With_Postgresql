@@ -74,20 +74,20 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 			// Step 4: Handle Different Attributes
 			// either we down cast or do toString, same thing here
 			if("github".equals(registrationId)) {
-				this.username = (String) attributes.getOrDefault("login", ""); // safely checks key exits and returns null bydefault if key not exits which we can modify to add another object, like we added ""
+				this.email = (String) attributes.getOrDefault("login", ""); // safely checks key exits and returns null bydefault if key not exits which we can modify to add another object, like we added ""
 				this.idAttributeKey =  "id";
 			}else if("google".equals(registrationId)) {
-				this.username = attributes.getOrDefault("email", null).toString();
+				this.email = attributes.getOrDefault("email", null).toString();
 				this.idAttributeKey = "sub";
 			}else {
-				 username = "";
+				 email = "";
 	             idAttributeKey = "id";
 			}
 			
 			System.out.println("HELLO OAUTH: " + email + " : " + name + " : " + username);
 			
 			// Step 5: if user already in dB:- update security context
-			Optional<Users> optUser = this.userService.findByUsernameOptional(email);
+			Optional<Users> optUser = this.userService.findByEmailOptional(email);
 			
 			if(optUser.isPresent()) {
 				// get the user
@@ -122,8 +122,12 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 				}else {
 					throw new RuntimeException("Default role not found");
 				}*/
-				System.out.println("username in ouathsuccesshandle: " + username);
-				newUser.setUsername(email);
+				System.out.println("email in ouathsuccesshandle: " + this.email); // this.email checking for github
+				
+				String[] usernameSplit = email.split("@");
+				username = usernameSplit[0];
+				newUser.setUsername(username);
+				newUser.setEmail(email);
 				newUser.setSignUpMethod(registrationId);
 				newUser.setPassword(""); // this is very important to get handle well with backend check so that no one can enter a blank password and able to access user account see gpt discussion
 				this.userService.registerUser(newUser);

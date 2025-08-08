@@ -64,15 +64,16 @@ public class UserController {
 	@GetMapping("/user") // not public
 	public ResponseEntity<Map<String, Object>> getUser(@AuthenticationPrincipal UserPrincipal principal){
 		System.out.println("User Principal in auth user: " + principal.getUsername());
-		Optional<Users> tempUser = this.userRepo.findByUsername(principal.getUsername());
+		Optional<Users> tempUser = this.userRepo.findByEmail(principal.getUsername());
 		
-		Users user = tempUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		Users user = tempUser.orElseThrow(() -> new RuntimeException("User not found"));
 		Set<Role> roles = user.getRoles();
 		
 		Map<String, Object> payload = new HashMap<String, Object>();
 		
 		payload.put("Username", user.getUsername());
 		payload.put("Roles", roles );
+		payload.put("email", user.getEmail());
 		payload.put("Id", user.getId());
 		payload.put("enabled", user.isEnabled()); // enabled
 		payload.put("createdDate", user.getCreatedDate());
@@ -89,7 +90,7 @@ public class UserController {
 	@PutMapping("/update-lock-status")
 	public ResponseEntity<String> updateAccountLockStatus(@RequestParam boolean lock, @AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		this.userService.updateAccountLockStatus(user.getId(), lock);
 		return ResponseEntity.ok("Account lock status updated");
 	}
@@ -97,7 +98,7 @@ public class UserController {
 	@PutMapping("/update-expiry-status")
 	public ResponseEntity<String> updateAccountExpiryStatus( @RequestParam boolean expire, @AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		this.userService.updateAccountExpiryStatus(user.getId(), expire);
 		return ResponseEntity.ok("Account Expiry Status Updated");
 	}
@@ -105,7 +106,7 @@ public class UserController {
 	@PutMapping("/update-enabled-status")
 	public ResponseEntity<String> updateAccountEnabledStatus( @RequestParam boolean enabled, @AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		this.userService.updateAccountEnabledStatus(user.getId(), enabled);
 		return ResponseEntity.ok("Account Enabled Status Updated");
 	}
@@ -113,15 +114,16 @@ public class UserController {
 	@PutMapping("/update-credentials-expiry-status")
 	public ResponseEntity<String> updateCredentialsExpiryStatus(@RequestParam boolean expire, @AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		this.userService.updateCredentialsExpiryStatus(user.getId(),expire);
 		return ResponseEntity.ok("Credentials Expiry Status Updated");
 	}
 	
 	@PostMapping("/update-credentials")
 	public ResponseEntity<String> updatePassword(@RequestParam String newUsername, @RequestParam String newPassword, @AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
+		System.out.println("update credentails Principal: "  + principal.getUsername());
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		
 		System.out.println("Update Credentials method");
 		
@@ -139,10 +141,10 @@ public class UserController {
 	// For Enabling 2fa
 	@PostMapping("/enable-2fa") // this is for generating the qr code and will be enabled after verification
 	public ResponseEntity<Map<String, String>> enable2FA(@AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
-		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		String username = principal.getUsername(); // email is extracted
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		GoogleAuthenticatorKey secret = this.userService.generateAuthenticatorKey(user.getId());
-		String qrCodeUrl = this.totpService.getQrCodeUrl(secret, username);
+		String qrCodeUrl = this.totpService.getQrCodeUrl(secret, username); // email is getting passed
 		Map<String, String> payload = new HashMap<>();
 		payload.put("qrCodeUrl", qrCodeUrl);
 		return ResponseEntity.ok(payload);
@@ -152,7 +154,7 @@ public class UserController {
 	@PostMapping("/disable-2fa")
 	public ResponseEntity<String> disable2FA(@AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		this.userService.disable2FA(user.getId());
 		return ResponseEntity.ok("2FA Disabled Successfully");
 		
@@ -161,7 +163,7 @@ public class UserController {
 	@PostMapping("/verify-2fa")
 	public ResponseEntity<String> verify2FA(@RequestParam int code ,@AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		
 		boolean isValid = this.userService.validate2FACode(user.getId(), code);
 		
@@ -180,7 +182,7 @@ public class UserController {
 	@GetMapping("/user/2fa-status")
 	public ResponseEntity<?> get2FAStatus(@AuthenticationPrincipal UserPrincipal principal) throws UserPrincipalNotFoundException{
 		String username = principal.getUsername();
-		Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		
 		if(user != null) {
 			return ResponseEntity.ok().body(Map.of("is2faEnabled", user.isTwoFactorEnabled()));
@@ -195,7 +197,7 @@ public class UserController {
 	 @PostMapping("/public/verify-2fa-login")
 	 public ResponseEntity<String> verify2FALogin(@RequestParam int code, @RequestParam String jwtToken) throws UserPrincipalNotFoundException {
         String username = this.jwtService.extractUsername(jwtToken);
-        Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+        Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 		
         boolean isValid = userService.validate2FACode(user.getId(), code);
         
@@ -228,7 +230,7 @@ public class UserController {
 		 Files.write(path, file.getBytes());
 		 
 		 String username = principal.getUsername();
-		 Users user = this.userRepo.findByUsername(username).orElseThrow(()-> new UserPrincipalNotFoundException("User not found Exception"));
+		 Users user = this.userRepo.findByEmail(username).orElseThrow(()-> new RuntimeException("User not found Exception"));
 			
 		 user.setProfilePicture("/profile/" + filename);
 		 this.userRepo.save(user);

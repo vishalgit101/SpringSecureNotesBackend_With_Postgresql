@@ -29,8 +29,8 @@ public class Users {
 	@Column(name="username")
 	private String username;
 	
-	/*@Column(name="email")
-	private String email;*/
+	@Column(name="email")
+	private String email;
 	
 	@Column(name="password")
 	private String password;
@@ -180,13 +180,13 @@ public class Users {
 		this.username = username;
 	}
 
-	/*public String getEmail() {
+	public String getEmail() {
 		return email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
-	}*/
+	}
 
 	public String getPassword() {
 		return password;
