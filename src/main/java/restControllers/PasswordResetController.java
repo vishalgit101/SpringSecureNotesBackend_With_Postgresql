@@ -22,7 +22,9 @@ public class PasswordResetController {
 
 	@PostMapping("/public/forgot-password")
 	public ResponseEntity<String> forgotPassword(@RequestParam String email){
+		//System.out.println("password reset controller: " + "");
 		try {
+			//System.out.println("password reset controller: " + "2");
 			this.userService.generatePasswordResetToken(email);
 			return ResponseEntity.ok().body("Password Reset Email Sent");
 		}catch (Exception e) {

@@ -237,7 +237,7 @@ public class Users {
 
 	@Override
 	public String toString() {
-		return "Users [id=" + id + ", username=" + username + ", password=" + password + ", createdDate=" + createdDate
+		return "Users [id=" + id + ", username=" + username + ", email=" + this.email + ", password=" + password + ", createdDate=" + createdDate
 				+ ", updatedDate=" + updatedDate + "]";
 	}
 	

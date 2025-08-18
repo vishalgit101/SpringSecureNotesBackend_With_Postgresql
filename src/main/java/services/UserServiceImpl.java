@@ -63,12 +63,12 @@ public class UserServiceImpl implements UserService {
 		//first check if the user exits already or not
 		//Optional<Users> optionalUser = this.userRepo.findByUsername(user.getUsername());
 		
-		if(this.userRepo.existsByUsername(user.getUsername())) {
+		if(this.userRepo.existsByUsername(user.getUsername().toLowerCase())) {
 			System.out.println("User already exists");
 			throw new UserAlreadyExists("Username '" + user.getUsername() + "' is already taken!");
 		}
 		
-		if(this.userRepo.existsByEmail(user.getEmail())) {
+		if(this.userRepo.existsByEmail(user.getEmail().toLowerCase())) {
 			System.out.println("User already exists");
 			throw new UserAlreadyExists("Email '" + user.getEmail() + "' is already taken!");
 		}
@@ -79,6 +79,8 @@ public class UserServiceImpl implements UserService {
 		user.addRole(role);
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedDate(LocalDateTime.now());
+		user.setUsername(user.getUsername().toLowerCase());
+		user.setEmail(user.getEmail().toLowerCase());
 		return this.userRepo.save(user);
 	}
 
@@ -230,13 +232,19 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public void generatePasswordResetToken(String email) {
+		
 		// find user by that email
 		Optional<Users> optUser = this.userRepo.findByEmail(email);
+		
 		Users user = optUser.orElseThrow(()-> new RuntimeException("User Not found"));
 		
 		// now pass the user in the constructor of password reset token object's instance
 		PasswordResetToken passwordResetToken = new PasswordResetToken(user); // its constructor did the job of creating everything
 		
+		// Before saving the user for password reset, delete the previous entry
+		
+		
+		int usersCount = this.passwordRestTokenRepo.deleteByUser(user);
 		// Now save this instance in its repo
 		this.passwordRestTokenRepo.save(passwordResetToken);
 		
