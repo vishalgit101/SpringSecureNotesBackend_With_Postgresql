@@ -62,6 +62,7 @@ public class SecurityConfigs {
 						auth.requestMatchers("/login", "/signup").permitAll()
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 						.requestMatchers("/api/csrf-token").permitAll()
+						.requestMatchers("/api/hello").permitAll()
 						.requestMatchers("/api/auth/public/**").permitAll()
 						.requestMatchers("/oauth2/**").permitAll()
 						.requestMatchers("/profile/**").permitAll()
