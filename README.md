@@ -119,7 +119,7 @@ https://springbootnotesvault.netlify.app/
 
 | Profile & 2FA |
 |--------------|
-| ![Profile](images/userprofile-with-2fa-and-update-credentials.png) |
+| ![Profile](images/userprofile-with-2fa-and-update-credentails.png) |
 
 ---
 
