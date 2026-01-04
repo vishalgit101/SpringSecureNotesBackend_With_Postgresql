@@ -10,10 +10,10 @@ The system implements **JWT + OAuth2 authentication**, **Two-Factor Authenticati
 Watch the demo videos here:
 
 - **Project Demo (YouTube)**  
-  ▶️ Spring Boot + React Full-Stack Application Demo
+  ▶️ [Spring Boot + React Full-Stack Application Demo](https://youtu.be/d7Ovd-UIWqQ)
 
 - **Project Demo (LinkedIn)**  
-  ▶️ Spring Boot + React Full-Stack Application Demo
+  ▶️ [Spring Boot + React Full-Stack Application Demo](https://www.linkedin.com/posts/vishal-choudhary-b9089a328_springboot-backenddevelopment-react-activity-7363568942138687488-cjWP?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFK2gxwB_oR_kc6PPGNS2vW_OU8PvCYaffM)
 
 ---
 
