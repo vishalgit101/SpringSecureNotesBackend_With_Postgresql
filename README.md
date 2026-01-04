@@ -2,7 +2,7 @@
 Watch the demo videos here:
 
 - **Project Demo (YouTube)**  
-  [Spring Boot + React Full-Stack Application Demo](https://youtu.be/uP6X6VaUNBs)
+  [Spring Boot + React Full-Stack Application Demo](https://youtu.be/d7Ovd-UIWqQ)
 
 - **Project Demo (LinkedIn)**  
   [Spring Boot + React Full-Stack Application Demo](https://www.linkedin.com/posts/vishal-choudhary-b9089a328_springboot-backenddevelopment-react-activity-7363568942138687488-cjWP)
