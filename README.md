@@ -1,6 +1,27 @@
 ## 🎥 Project Demo
-Watch the demo video here:  
-[Spring Boot + React Full-Stack Application Demo](https://www.linkedin.com/posts/vishal-choudhary-b9089a328_springboot-backenddevelopment-react-activity-7363568942138687488-cjWP)
+Watch the demo videos here:
+
+- **Project Demo (YouTube)**  
+  [Spring Boot + React Full-Stack Application Demo](https://youtu.be/d7Ovd-UIWqQ)
+
+- **Project Demo (LinkedIn)**  
+  [Spring Boot + React Full-Stack Application Demo](https://www.linkedin.com/posts/vishal-choudhary-b9089a328_springboot-backenddevelopment-react-activity-7363568942138687488-cjWP)
+
+---
+
+## 🌐 Live Demo
+
+**🔗 Hosted Demo:**  
+https://springbootnotesvault.netlify.app/
+
+### Demo Credentials (for testing)
+- **User**
+  - Email: `demo@gmail.com`
+  - Password: `demo123`
+
+- **Admin**
+  - Email: `admin@gmail.com`
+  - Password: `admin123`
 
 ---
 
